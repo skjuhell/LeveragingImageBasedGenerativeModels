@@ -6,6 +6,8 @@ import time
 from sklearn.manifold import TSNE
 
 def create_umap_plot(ori_seq,syn_seq,suffix,title,elements):
+  ori_seq = np.squeeze(ori_seq)
+  syn_seq = np.squeeze(syn_seq)
   print('UMAP Clustering...')
   reducer = umap.UMAP()
 
@@ -22,13 +24,13 @@ def create_umap_plot(ori_seq,syn_seq,suffix,title,elements):
     x=embedding[:, 0],
     y=embedding[:, 1],
     c = [0]*int(embedding.shape[0]/2)+[1]*int(embedding.shape[0]/2),
-    cmap=ListedColormap(['g','r']),
-    alpha=.3,
+    cmap=ListedColormap(['#CC9633','#70B2E4']),
+    alpha=.6,
     s=80
 )
   classes = ['original','synthetic']
   ax.legend(handles=scatter.legend_elements()[0], labels=classes)
-  ax.set_title(title, fontsize=12)
+  #ax.set_title(title, fontsize=12)
   plt.savefig('results/visualization/umap_'+suffix+'.png')
 
 
@@ -51,12 +53,12 @@ def create_tsne_plot(ori_seq,syn_seq,suffix,title):
     x=embedding[:, 0],
     y=embedding[:, 1],
     c = [0]*int(embedding.shape[0]/2)+[1]*int(embedding.shape[0]/2),
-    cmap=ListedColormap(['g','r']),
-    alpha=.3,
+    cmap=ListedColormap(['#CC9633','#70B2E4']),
+    alpha=.6,
     s=80
 )
   classes = ['original','synthetic']
   ax.legend(handles=scatter.legend_elements()[0], labels=classes)
-  ax.set_title(title, fontsize=12)
+  #ax.set_title(title, fontsize=12)
   suffix_path = suffix.replace(' ','_')
-  plt.savefig('metrics/tsne_'+suffix+'.png')
+  plt.savefig('results/visualization/tsne_'+suffix+'.png')

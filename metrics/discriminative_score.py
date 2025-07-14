@@ -7,7 +7,8 @@ np.set_printoptions(formatter={'float': '{: 0.8f}'.format})
 ## Network parameters taken from yoon et al
 
 def discriminative_score(ori_seq,syn_seq,args):
-
+    ori_seq = np.squeeze(ori_seq)
+    syn_seq = np.squeeze(syn_seq)
     ori_seq = np.expand_dims(ori_seq.astype('float32'),axis=1)
     syn_seq = np.expand_dims(syn_seq.astype('float32'),axis=1)
 
@@ -27,8 +28,8 @@ def discriminative_score(ori_seq,syn_seq,args):
         model = tf.keras.Sequential()
         model.add(tf.keras.layers.GRU(units=args.hidden_dim_discriminative,activation='relu',return_sequences=True,dropout=.4))
         model.add(tf.keras.layers.GRU(units=args.hidden_dim_discriminative,activation='sigmoid',return_sequences=False,dropout=.4))
-        model.add(tf.keras.layers.Dense(units=1,activation='softmax'))
-        model.compile(optimizer="Adam", loss="binary_crossentropy",metrics=['accuracy'])
+        model.add(tf.keras.layers.Dense(units=1,activation='sigmoid'))
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001,beta_1=0.9,beta_2=0.999,epsilon=1e-07,amsgrad=False,name='Adam'), loss=tf.keras.losses.BinaryCrossentropy(),metrics=['accuracy'])
 
         x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.1, shuffle=True)
 

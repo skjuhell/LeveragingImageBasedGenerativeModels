@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 import tensorflow as tf
+
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
@@ -10,7 +11,9 @@ from sklearn.utils import shuffle
 np.set_printoptions(formatter={'float': '{: 0.8f}'.format})
 
 def predictive_score(ori_seq,syn_seq,args):
-    
+    print(ori_seq.shape,syn_seq.shape)
+    ori_seq = np.squeeze(ori_seq)
+    syn_seq = np.squeeze(syn_seq)
     ori_seq_x = np.expand_dims(ori_seq[:,:-1].astype('float32'),axis=1)
     ori_seq_y = np.expand_dims(ori_seq[:,-1].astype('float32'),axis=1)
 
@@ -28,7 +31,7 @@ def predictive_score(ori_seq,syn_seq,args):
         model.add(tf.keras.layers.GRU(units=args.hidden_dim_predictive,activation='relu',return_sequences=True))
         model.add(tf.keras.layers.GRU(units=args.hidden_dim_predictive))
         model.add(tf.keras.layers.Dense(units=1,activation='relu'))
-        model.compile(optimizer="Adam", loss="mae", metrics=["mse"])
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001,beta_1=0.9,beta_2=0.999,epsilon=1e-07,amsgrad=False,name='Adam'), loss=tf.keras.losses.MeanAbsoluteError(), metrics=[tf.keras.losses.MeanSquaredError()])
         model.fit(x=syn_seq_x,y=syn_seq_y,validation_split=0.2,epochs=args.iterations_predictive,batch_size=args.batch_size_predictive,verbose=0,callbacks=[pred_cbk])
         result = model.evaluate(x=ori_seq_x,y=ori_seq_y)[0]
         pred_score_syn.append(result)

@@ -6,6 +6,10 @@ from statsmodels.tsa.arima_process import ArmaProcess
 from tensorflow import keras
 from tensorflow.keras import layers
 
+tf.random.set_seed(
+    42
+)
+
 def conv_block(
     x,
     filters,
@@ -271,12 +275,12 @@ class WGAN(keras.Model):
 def train_WGAN(ori_data_imgs,args):
 
     # Instantiate the optimizer for both networks
-    # (learning_rate=0.0002, beta_1=0.5 are recommended in the initial paper)
+    # (learning_rate=0.0001, beta_1=0 are recommended in the initial paper)
     generator_optimizer = keras.optimizers.Adam(
-        learning_rate=0.0002, beta_1=0.5, beta_2=0.9
+        learning_rate=args.learning_rate, beta_1=0, beta_2=0.9
     )
     discriminator_optimizer = keras.optimizers.Adam(
-        learning_rate=0.0002, beta_1=0.5, beta_2=0.9
+        learning_rate=args.learning_rate, beta_1=0, beta_2=0.9
     )
 
     # Define the loss functions for the discriminator,
@@ -318,6 +322,7 @@ def train_WGAN(ori_data_imgs,args):
     # Sample examples
     random_latent_vectors = tf.random.normal(shape=(ori_data_imgs.shape[0], args.noise_dim))
     generated_imgs = wgan.generator(random_latent_vectors)
-    print('generated images shape:'+str(generated_imgs.shape))
-
-    return  np.squeeze(ori_data_imgs),np.squeeze(generated_imgs)
+    ori_data_imgs = np.squeeze(ori_data_imgs)
+    syn_data_imgs = np.squeeze(generated_imgs)
+    
+    return  ori_data_imgs,syn_data_imgs
