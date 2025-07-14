@@ -9,7 +9,7 @@ Networks For Time Series Generation_ by Hellermann and Lessmann.
 
 ## Contact
 
-For questions or support, please contact **Justin Hellermann** at [justin.hellermann@hu-berlin.com](mailto:justin.hellermann@hu-berlin.com) or Stefan Lessmann at [stefan.lessmann@hu-berlin.com](mailto:stefan.lessmann@hu-berlin.com).
+For questions or support, please contact **Justin Hellermann** at [justin.hellermann@hu-berlin.com](mailto:justin.hellermann@hu-berlin.de) or Stefan Lessmann at [stefan.lessmann@hu-berlin.de](mailto:stefan.lessmann@hu-berlin.com).
 
 ---
 
