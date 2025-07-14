@@ -1,35 +1,55 @@
 # Leveraging Image-based Generative Adversarial Networks For Time Series Generation
 
-This repository provides the code supplementing Leveraging Image-based Generative Adversarial
-Networks For Time Series Generation by Hellermann and Lessmann.
+This repository provides the code supplementing _Leveraging Image-based Generative Adversarial
+Networks For Time Series Generation_ by Hellermann and Lessmann.
 
-## Contact
-
-## For questions or support, please contact **Justin Hellermann** at [justin.hellermann@hu-berlin.com](mailto:justin.hellermann@hu-berlin.com).
-
-## Environment Setup
-
-IMPORTANT: Each model has specific Python version compatibility!
-
-| Model     | Python Version | Requirements File               |
-| --------- | -------------- | ------------------------------- |
-| WGAN_GP   | Python ≥ 3.8   | requirements_wgan_diffusion.txt |
-| Diffusion | Python ≥ 3.8   | requirements_wgan_diffusion.txt |
-| TimeGAN   | Python ≤ 3.6   | requirements_timegan.txt        |
+> **Assembled:** July 2025
 
 ---
 
-### Operating System Compatibility
+## Contact
 
-This project is intended to run in a POSIX-compliant environment, such as Linux. It has been tested on systems reporting the following, when execeuted in Python:
+For questions or support, please contact **Justin Hellermann** at [justin.hellermann@hu-berlin.com](mailto:justin.hellermann@hu-berlin.com) or Stefan Lessmann at [stefan.lessmann@hu-berlin.com](mailto:stefan.lessmann@hu-berlin.com).
 
-- `os.name`: `posix`
-- `platform.system()`: `Linux`
-- `platform.release()`: `6.1.x` (or similar)
+---
 
-Ensure your environment supports standard Unix-like behavior for full compatibility with shell commands and system dependencies.
+## Repository Structure
 
-## Installation
+| Folder/File                       | Description                                                  |
+| --------------------------------- | ------------------------------------------------------------ |
+| `main.py`                         | Main entry point for training, generating, and benchmarking  |
+| `data/raw_data/`                  | Folder to place raw input CSVs                               |
+| `data/ori/`                       | Stores original sequences                                    |
+| `data/syn/`                       | Stores synthetic sequences                                   |
+| `results/`                        | Stores benchmarking results, logs, and UMAP visualizations   |
+| `requirements_wgan_diffusion.txt` | Dependency file for WGAN and Diffusion models                |
+| `requirements_timegan.txt`        | Dependency file for TimeGAN                                  |
+| `utils`                           | Utility functions for preprocessing and evaluation           |
+| `utils_timegan`                   | Utility functions for preprocessing and evaluation (TimeGAN) |
+
+---
+
+## Computing Environment
+
+- **Operating System:** POSIX-compliant system (Linux recommended)
+- **Tested On:**
+  - `os.name`: `posix`
+  - `platform.system()`: `Linux`
+  - `platform.release`: `6.1.x`
+- **Python Versions:**
+  - WGAN_GP & Diffusion: Python ≥ 3.8
+  - TimeGAN: Python ≤ 3.6
+- **Expected Runtime:**
+  - TimeGAN: ~25 minutes (CPU) per series
+  - WGAN_GP: ~10 minutes (GPU recommended) per series
+  - Diffusion: ~10 minutes (GPU recommended) per series
+- **Hardware Recommendation:**
+  - RAM: 16+ GB
+  - GPU (optional but recommended for Diffusion): NVIDIA CUDA-enabled GPU
+
+---
+
+## Environment Setup
 
 ### For WGAN or Diffusion
 
@@ -49,7 +69,24 @@ pip install -r requirements_timegan.txt
 
 ---
 
-## Usage
+## Data Description
+
+- **Format:** CSV with rows as time steps and columns as features
+- **Location for Raw Input:**  
+  `data/raw_data/{data_name}.csv`
+- **Synthetic Output Data:**
+  - Generated sequences: `data/syn/`
+  - Original sequences: `data/ori/`
+
+### Access & Preprocessing
+
+- **Synthetic datasets** (e.g., `noisy_sine`) are auto-generated and placed in `data/raw_data/` and do not require external access.
+- **Public datasets**, are also placed in `data/raw_data/` (see paper for references).
+- **Preprocessing** (e.g., normalization and windowing) is automatically handled by the code.
+
+---
+
+## Usage Examples
 
 ### Generate Synthetic Data
 
@@ -59,48 +96,38 @@ python3 main.py --data_name=noisy_sine --model=Diffusion --mode=generate --colum
 
 ### Benchmark Generated Data
 
-After running the code with the generation flag, the benchmark flag will conduct the benchmarking. Make sure all combinations have been run before calling the benchmark script. Since the comparison is only conducted among trials, which have successfully run.
-
 ```bash
 python3 main.py --data_name=noisy_sine --model=Diffusion --mode=benchmark --column=noise_scale_00 --representation=ts
+```
+
+To see all available options:
+
+```bash
+python main.py --help
 ```
 
 ---
 
 ## Supported Models
 
-- WGAN_GP: Wasserstein GAN with Gradient Penalty
-- TimeGAN: Temporal Generative Adversarial Network
-- Diffusion: Score-based generative model
+- **WGAN_GP** — Wasserstein GAN with Gradient Penalty
+- **TimeGAN** — Temporal Generative Adversarial Network
+- **Diffusion** — Score-based generative model
 
 ---
 
 ## Evaluation Metrics
 
-The script supports benchmarking using the following metrics:
-
-- Predictive Score — assesses how well a model trained on synthetic data generalizes to real data.
-- Discriminative Score — evaluates whether a classifier can distinguish real from synthetic data.
-- Augmentation Score — tests the utility of synthetic data in boosting performance when used with real data.
-
-UMAP and t-SNE visualizations are supported for qualitative comparisons. In the results folder, you can find a selection of UMAP plots, since uploading all plots exceeds the capacity of the portal.
-
----
-
-## Data & Output
-
-- Input CSV files should be placed in:  
-  `data/raw_data/{data_name}.csv`
-
-- Output files (generated and original sequences) are saved to:
-  - `data/syn/` — synthetic sequences
-  - `data/ori/` — original sequences
+- **Predictive Score** — Generalization of models trained on synthetic data to real data
+- **Discriminative Score** — Distinguishability of real vs synthetic data
+- **Augmentation Score** — Performance gain from training on synthetic + real data
+- **UMAP** — Dimensionality reduction for visual quality checks
 
 ---
 
 ## Results Logging
 
-All benchmark results (metrics) are automatically logged to a CSV file using the `write_results` utility function.
+Benchmark results are logged to a CSV file using the built-in `write_results` utility.
 
 ### Location
 
@@ -108,36 +135,53 @@ All benchmark results (metrics) are automatically logged to a CSV file using the
 results/backtest/scores.csv
 ```
 
-### Logged Fields
+### Fields
 
-Each row in the file includes:
+| Field           | Description                                      |
+| --------------- | ------------------------------------------------ |
+| model           | Generative model used                            |
+| data_name       | Dataset name                                     |
+| column          | Target column                                    |
+| representation  | Representation method (e.g., `ts`, `xirp`)       |
+| recovery_method | Method used to inverse transform representations |
+| metric          | Evaluation metric name                           |
+| score           | Mean score                                       |
+| std             | Score standard deviation                         |
+| datetime        | Timestamp of the run                             |
 
-| Field           | Description                                     |
-| --------------- | ----------------------------------------------- |
-| model           | The generative model used                       |
-| data_name       | Dataset name                                    |
-| column          | Target column used                              |
-| representation  | Representation method (e.g., xirp, gasf)        |
-| recovery_method | Recovery method used for inverse transformation |
-| metric          | Metric name (e.g., pred_score, disc_score)      |
-| score           | Mean score value                                |
-| std             | Standard deviation of the score                 |
-| datetime        | Timestamp of the run                            |
+---
 
-If the CSV file doesn't exist yet, the header row is created. All subsequent runs append to the file.
+## Reproducing Tables and Figures in the Paper
+
+| Paper Element               | Command / Script                                                                                          |
+| --------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Table 1 (benchmark metrics) | Run `main.py` with `--mode=benchmark` for each dataset & model. Results in `results/backtest/scores.csv`. |
+| UMAP plots                  | UMAPs are generated during evaluation and stored in `results/umap/`.                                      |
+
+
+---
+
+## Data Sharing Policy
+
+- No proprietary or NDA-restricted data is included.
+
+---
+
+## License & Use
+
+The code is provided **solely for the purpose of reproducibility verification** for the manuscript submitted to the _International Journal of Forecasting_.
+
+It is **not licensed for public distribution or commercial use**.  
+For reuse beyond reproduction, please contact the authors for explicit permission.
 
 ---
 
 ## Help
 
-To explore all available arguments:
+To see all available flags and configuration options:
 
 ```bash
 python main.py --help
 ```
 
-## License & Use
-
-The code is provided solely to support the reproducibility check of our paper submitted to the International Journal of Forecasting.  
-It is not licensed for public distribution or commercial use.  
-Please contact the authors for reuse permissions.
+---
